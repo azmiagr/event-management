@@ -13,8 +13,8 @@ import (
 )
 
 type IUserService interface {
-	Register(param model.UserRegisterParam) error
-	Login(param model.UserLoginParam) (*model.UserLoginResponse, error)
+	Register(param *model.UserRegisterParam) error
+	Login(param *model.UserLoginParam) (*model.UserLoginResponse, error)
 }
 
 type UserService struct {
@@ -33,7 +33,7 @@ func NewUserService(userRepository repository.IUserRepository, bcrypt bcrypt.Int
 	}
 }
 
-func (s *UserService) Register(param model.UserRegisterParam) error {
+func (s *UserService) Register(param *model.UserRegisterParam) error {
 	tx := s.db.Begin()
 	defer tx.Rollback()
 
@@ -76,7 +76,7 @@ func (s *UserService) Register(param model.UserRegisterParam) error {
 	return nil
 }
 
-func (s *UserService) Login(param model.UserLoginParam) (*model.UserLoginResponse, error) {
+func (s *UserService) Login(param *model.UserLoginParam) (*model.UserLoginResponse, error) {
 	tx := s.db.Begin()
 	defer tx.Rollback()
 
