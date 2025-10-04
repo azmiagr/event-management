@@ -13,7 +13,7 @@ func (r *Rest) Register(c *gin.Context) {
 	err := c.ShouldBindJSON(&param)
 
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "invalid params", err)
+		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
 		return
 	}
 
