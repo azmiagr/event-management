@@ -27,6 +27,10 @@ func (r *Rest) MountEndpoint() {
 	auth.POST("/register", r.Register)
 	auth.POST("/login", r.Login)
 
+	google := auth.Group("/google")
+	google.GET("/login", r.GoogleLogin)
+	google.GET("/callback", r.GoogleCallback)
+
 }
 
 func (r *Rest) Run() {
