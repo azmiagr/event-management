@@ -34,11 +34,11 @@ type OAuthService struct {
 	jwt            jwt.Interface
 }
 
-func NewOAuthService(userRepository repository.IUserRepository, bcrypt bcrypt.Interface, jwt jwt.Interface, oauh *config.OAuthConfig) IOAuthService {
+func NewOAuthService(userRepository repository.IUserRepository, bcrypt bcrypt.Interface, jwt jwt.Interface, oauth *config.OAuthConfig) IOAuthService {
 	return &OAuthService{
 		db:             mariadb.Connection,
 		UserRepository: userRepository,
-		oauth:          oauh,
+		oauth:          oauth,
 		bcrypt:         bcrypt,
 		jwt:            jwt,
 	}
