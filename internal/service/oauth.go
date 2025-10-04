@@ -155,7 +155,7 @@ func (s *OAuthService) findOrCreateUser(googleUser *model.GoogleUserInfo) (*enti
 		Name:     googleUser.Name,
 		Picture:  &googleUser.Picture,
 		Email:    googleUser.Email,
-		RoleID:   1,
+		RoleID:   2,
 	}
 
 	_, err = s.UserRepository.CreateUser(tx, newUser)
