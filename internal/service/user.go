@@ -9,6 +9,9 @@ import (
 	"event-management/pkg/database/mariadb"
 	"event-management/pkg/jwt"
 	"event-management/pkg/mail"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -17,6 +20,8 @@ import (
 type IUserService interface {
 	Register(param *model.UserRegisterParam) error
 	Login(param *model.UserLoginParam) (*model.UserLoginResponse, error)
+	VerifyUser(param model.VerifyUser) error
+	GetUser(param model.GetUserParam) (*entity.User, error)
 }
 
 type UserService struct {
@@ -130,4 +135,59 @@ func (s *UserService) Login(param *model.UserLoginParam) (*model.UserLoginRespon
 	}
 
 	return result, nil
+}
+
+func (s *UserService) VerifyUser(param model.VerifyUser) error {
+	tx := s.db.Begin()
+	defer tx.Rollback()
+
+	otp, err := s.OtpRepository.GetOtp(tx, model.GetOtp{
+		UserID: param.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	if otp.Code != param.OtpCode {
+		return errors.New("invalid otp code")
+	}
+
+	expiredTime, err := strconv.Atoi(os.Getenv("EXPIRED_OTP"))
+	if err != nil {
+		return err
+	}
+
+	expiredThreshold := time.Now().UTC().Add(-time.Duration(expiredTime) * time.Minute)
+	if otp.UpdatedAt.Before(expiredThreshold) {
+		return errors.New("otp expired")
+	}
+
+	user, err := s.UserRepository.GetUser(tx, model.GetUserParam{
+		UserID: param.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	user.StatusAccount = "active"
+	_, err = s.UserRepository.UpdateUser(tx, user)
+	if err != nil {
+		return err
+	}
+
+	err = s.OtpRepository.DeleteOtp(tx, otp)
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserService) GetUser(param model.GetUserParam) (*entity.User, error) {
+	return u.UserRepository.GetUser(u.db, param)
 }
