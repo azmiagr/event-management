@@ -150,15 +150,16 @@ func (s *OAuthService) findOrCreateUser(googleUser *model.GoogleUserInfo) (*enti
 	}
 
 	newUser := &entity.User{
-		UserID:   uuid.New(),
-		GoogleID: &googleUser.ID,
-		Name:     googleUser.Name,
-		Picture:  &googleUser.Picture,
-		Email:    googleUser.Email,
-		RoleID:   2,
+		UserID:        uuid.New(),
+		GoogleID:      &googleUser.ID,
+		Name:          googleUser.Name,
+		Picture:       &googleUser.Picture,
+		Email:         googleUser.Email,
+		StatusAccount: "active",
+		RoleID:        2,
 	}
 
-	_, err = s.UserRepository.CreateUser(tx, newUser)
+	createdUser, err := s.UserRepository.CreateUser(tx, newUser)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +169,7 @@ func (s *OAuthService) findOrCreateUser(googleUser *model.GoogleUserInfo) (*enti
 		return nil, err
 	}
 
-	return s.UserRepository.GetUser(tx, model.GetUserParam{GoogleID: &googleUser.ID})
+	return createdUser, nil
 
 }
 
