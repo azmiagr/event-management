@@ -34,3 +34,8 @@ type GoogleUserInfo struct {
 type OAuthLoginResponse struct {
 	Token string `json:"token"`
 }
+
+type VerifyUser struct {
+	UserID  uuid.UUID `json:"user_id" binding:"required"`
+	OtpCode string    `json:"otp_code" binding:"required"`
+}
