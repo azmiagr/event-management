@@ -8,6 +8,7 @@ import (
 	"event-management/pkg/config"
 	"event-management/pkg/database/mariadb"
 	"event-management/pkg/jwt"
+	"event-management/pkg/middleware"
 	"log"
 )
 
@@ -28,9 +29,12 @@ func main() {
 	bcrypt := bcrypt.Init()
 	jwt := jwt.Init()
 	oauth := config.NewOAuthConfig()
-	svc := service.NewService(repo, bcrypt, jwt, oauth)
+	snapClient := config.NewMidtransSnapClient()
+	coreAPIClient := config.NewMidtransCoreAPIClient()
+	svc := service.NewService(repo, bcrypt, jwt, oauth, snapClient, coreAPIClient)
+	middleware := middleware.Init(svc, jwt)
 
-	r := rest.NewRest(svc)
+	r := rest.NewRest(svc, middleware)
 	r.MountEndpoint()
 	r.Run()
 }
