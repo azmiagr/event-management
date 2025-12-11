@@ -295,7 +295,3 @@ The server will run at `http://localhost:8080`
 4. Implement business logic in `internal/service/`
 5. Create handler in `internal/handler/rest/`
 6. Register endpoint in `rest.go`
-
-## 📞 Support
-
-For questions or assistance, please contact azmiagr@gmail.com
